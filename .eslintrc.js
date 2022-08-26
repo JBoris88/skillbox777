@@ -18,7 +18,8 @@ module.exports = {
         some: ['nesting', 'id'],
       },
     }],
-    'max-len': ['error', { code: 150 }],
+    'max-len': ['error', { code: 250 }],
     'no-trailing-spaces': 'off',
+    // 'vue/no-mutating-props': 'off',
   },
 };
