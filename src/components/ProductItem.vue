@@ -1,6 +1,6 @@
 <template>
     <li class="catalog__item">
-            <a class="catalog__pic" href="#">
+            <a class="catalog__pic" href="#" @click.prevent="gotoPage('product', {id: productitem.id})">
               <img :src="productitem.image" :alt="productitem.title">
             </a>
 
@@ -11,7 +11,7 @@
             </h3>
 
             <span class="catalog__price">
-              {{ productitem.price }} ₽
+              {{ productitem.price | numberFormat}} ₽
             </span>
             <ul class="colors colors--black">
               <li class="colors__item" v-for="productcolor in colorsOfProduct" :key="productcolor.id">
@@ -51,7 +51,10 @@
 </template>
 
 <script>
-import coloraspects from '../data/colorAspects';
+
+import coloraspects from '@/data/colorAspects';
+import gotoPage from '@/helpers/gotoPage';
+import numberFormat from '@/helpers/numberFormat';
 
 export default ({
   data() {
@@ -60,6 +63,9 @@ export default ({
     };
   },
   props: ['productitem'],
+  filters: {
+    numberFormat,
+  },
   computed: {
     colorAspects() {
       return coloraspects;
@@ -69,6 +75,9 @@ export default ({
       clrsOfProd = this.colorAspects.filter((x) => this.productitem.colorAspects.indexOf(x.id) > -1);
       return clrsOfProd;
     },
+  },
+  methods: {
+    gotoPage,
   },
 });
 </script>

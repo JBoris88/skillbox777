@@ -18,8 +18,9 @@ module.exports = {
         some: ['nesting', 'id'],
       },
     }],
-    'max-len': ['error', { code: 250 }],
+    'max-len': ['error', { code: 750 }],
     'no-trailing-spaces': 'off',
+    'vuejs-accessibility/form-control-has-label': 'off',
     // 'vue/no-mutating-props': 'off',
   },
 };

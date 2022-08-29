@@ -112,8 +112,8 @@
 </template>
 
 <script>
-import categories from '../data/categories';
-import coloraspects from '../data/colorAspects';
+import categories from '@/data/categories';
+import coloraspects from '@/data/colorAspects';
 
 export default {
   data() {
