@@ -1,5 +1,8 @@
 <template>
-      <main class="content container">
+  <main class="content container" v-if="productLoading"><base-preloader/></main>
+  <main class="content container" v-else-if="productLoadingFailed">Произошла ошибка при загрузке товара...<button @click.prevent="loadProduct">Повторить</button></main>
+  <main class="content container" v-else-if="!productData">Не удалось загрузить информацио о товаре.</main>
+  <main class="content container" v-else>
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -115,9 +118,12 @@
                 </button>
               </div>
 -->
-              <button class="button button--primery" type="submit">
+              <button class="button button--primery" type="submit" :disabled="productAddSending">
                 В корзину
               </button>
+
+              <div v-show="productAdded">Товар добавлен в корзину.</div>
+              <div v-show="productAddSending">Добавление в корзину...</div>
             </div>
           </form>
         </div>
@@ -177,18 +183,31 @@
 </template>
 
 <script>
-import products from '@/data/products';
-import categories from '@/data/categories';
+// import products from '@/data/products';
+// import categories from '@/data/categories';
 import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 import ProductCounter from '@/components/ProductCounter.vue';
+import BasePreloader from '@/components/BasePreloader.vue';
+import axios from 'axios';
+import { mapActions } from 'vuex';
+
+import { API_BASE_URL } from '../config';
 
 export default ({
   // props: ['pageParams'],
-  components: { ProductCounter },  
+  components: { ProductCounter, BasePreloader },  
   data() {
     return {
       productAmount: 1,
+
+      productData: null,
+
+      productLoading: false,
+      productLoadingFailed: false,      
+
+      productAdded: false,
+      productAddSending: false,
     };
   },
   filters: {
@@ -196,18 +215,59 @@ export default ({
   },
   computed: {
     product() {
-      // return products.find((x) => x.id === this.pageParams.id);
-      return products.find((x) => x.id === this.$route.params.id);
+      // // return products.find((x) => x.id === this.pageParams.id);
+      // return products.find((x) => x.id === this.$route.params.id);
+      return this.productData
+        ? {
+          ...(this.productData),
+          image: (this.productData).image.file.url,
+          colorAspects: (this.productData).colors.map((color) => (color.id)),
+        } 
+        : {};
     },
     category() {
-      return categories.find((x) => x.id === this.product.categoryId);
+      // return categories.find((x) => x.id === this.product.categoryId);
+      return this.productData.category ? this.productData.category : {};
     },
   },
   methods: {
+    ...mapActions(['addProductToCart']),
     gotoPage,
     addToCart() {
-      this.$store.commit('addProductToCart', { productId: this.product.id, amount: this.productAmount });
+      // this.$store.commit('addProductToCart', { productId: this.product.id, amount: this.productAmount });
+      this.productAdded = false;
+      this.productAddSending = true;
+      this.addProductToCart({ productId: this.product.id, amount: this.productAmount })
+        .then(() => {
+          this.productAdded = true;
+          this.productAddSending = false;
+        });
+    },
+    loadProduct() {
+      this.productLoading = true;
+      this.productLoadingFailed = false;
+      return axios.get(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
+        .then((response) => { this.productData = response.data; })
+        .catch(() => { this.productLoadingFailed = true; })
+        .then(() => { this.productLoading = false; });
+    },  
+  },
+  watch: {
+    '$route.params.id': {
+      handler() { this.loadProduct(); },
+      immediate: true,
     },
   },  
+  /*
+  created() {
+    this.loadProduct();
+  },
+  watch: {
+    // eslint-disable-next-line object-shorthand
+    '$route.params.id'() {
+      this.loadProduct();
+    },
+  },
+  */
 });
 </script>

@@ -22,7 +22,8 @@
       </span>
     </div>
 
-    <section class="cart">
+    <base-preloader v-if="$store.state.cartLoading===true"/>
+    <section class="cart" v-else>
       <form class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <ul class="cart__list">
@@ -52,9 +53,10 @@ import numberFormat from '@/helpers/numberFormat';
 import decOfNum from '@/helpers/decOfNum';
 import { mapGetters } from 'vuex';
 import CartItem from '@/components/CartItem.vue';
+import BasePreloader from '@/components/BasePreloader.vue';
 
 export default {
-  components: { CartItem },
+  components: { CartItem, BasePreloader },
   filters: { numberFormat },
   computed: {
     ...mapGetters({ products: 'cartDetailProducts', totalSum: 'cartTotalPrice', totalProducts: 'cartTotalPositionsNumber' }),

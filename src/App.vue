@@ -111,6 +111,7 @@
 
 <script>
 import CartIndicator from '@/components/CartIndicator.vue';
+import { mapActions, mapMutations } from 'vuex';
 /*
 import MainPage from '@/pages/MainPage.vue';
 import ProductPage from '@/pages/ProductPage.vue';
@@ -126,6 +127,19 @@ const routes = {
 export default {
   components: { CartIndicator },
   name: 'App',
+  created() {
+    // this.$store.dispatch('loadCart');
+    const userAccessKey = localStorage.getItem('userAccessKey');
+    if (userAccessKey) {
+      this.updateuserAccessKey(userAccessKey);
+    } 
+    this.loadCart();   
+  },
+  methods: {
+    // eslint-disable-next-line dot-notation
+    ...mapActions(['loadCart']),
+    ...mapMutations(['updateuserAccessKey']),
+  },
   /*
   components: {
     MainPage,

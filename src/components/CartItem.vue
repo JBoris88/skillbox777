@@ -42,7 +42,7 @@
 
 <script>
 import numberFormat from '@/helpers/numberFormat';
-import { mapMutations } from 'vuex';
+import { mapActions } from 'vuex';
 import ProductCounter from '@/components/ProductCounter.vue';
 
 export default {
@@ -55,13 +55,14 @@ export default {
         return this.item.amount;
       },
       set(value) {        
-        this.$store.commit('updateCartProduct', { productId: this.item.productId, amount: value });
+        // this.$store.commit('updateCartProduct', { productId: this.item.productId, amount: value });
+        this.$store.dispatch('updateCartProductAmount', { productId: this.item.productId, amount: value });
         return value;
       },
     },
   },
   methods: {
-    ...mapMutations({ deleteProduct: 'deleteCartProduct' }),
+    ...mapActions({ deleteProduct: 'deleteCartProduct' }),
     /* deleteProduct(productId) {
       this.$store.commit('deleteCartProduct', { productId });
     }, */

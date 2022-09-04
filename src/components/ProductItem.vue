@@ -53,14 +53,20 @@
 
 <script>
 
-import coloraspects from '@/data/colorAspects';
+// import coloraspects from '@/data/colorAspects';
 import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
+
+import axios from 'axios';
+// eslint-disable-next-line import/extensions
+import { API_BASE_URL } from '@/config.js';
 
 export default ({
   data() {
     return {
       color: '#73B6EA',
+
+      colorAspectsData: null, 
     };
   },
   props: ['productitem'],
@@ -69,7 +75,9 @@ export default ({
   },
   computed: {
     colorAspects() {
-      return coloraspects;
+      return this.colorAspectsData 
+        ? this.colorAspectsData.items.map((color) => ({ ...color, color: color.code, backcolor: color.code })) 
+        : []; 
     },
     colorsOfProduct() {
       let clrsOfProd = [];
@@ -79,6 +87,14 @@ export default ({
   },
   methods: {
     gotoPage,
+
+    loadColorAspects() {
+      return axios.get(`${API_BASE_URL}/api/colors`)
+        .then((response) => { this.colorAspectsData = response.data; });
+    },    
   },
+  created() {
+    this.loadColorAspects();
+  },    
 });
 </script>

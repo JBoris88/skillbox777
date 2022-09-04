@@ -112,8 +112,11 @@
 </template>
 
 <script>
-import categories from '@/data/categories';
-import coloraspects from '@/data/colorAspects';
+// import categories from '@/data/categories';
+// import coloraspects from '@/data/colorAspects';
+import axios from 'axios';
+// eslint-disable-next-line import/extensions
+import { API_BASE_URL } from '@/config.js';
 
 export default {
   data() {
@@ -122,15 +125,22 @@ export default {
       currentPriceTo: 0,
       currentCategoryId: 0,
       currentColorAspect: 0,
+
+      categoriesData: null, 
+      colorAspectsData: null, 
     };
   },
   props: ['priceFrom', 'priceTo', 'categoryId', 'colorAspect'],
   computed: {   
     categories() {
-      return categories;
+      return this.categoriesData 
+        ? this.categoriesData.items 
+        : [];      
     },
     colorAspects() {
-      return coloraspects;
+      return this.colorAspectsData 
+        ? this.colorAspectsData.items.map((color) => ({ ...color, color: color.code, backcolor: color.code })) 
+        : [];  
     },
   },
   watch: {
@@ -160,6 +170,18 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:colorAspect', 0);
     },    
+    loadCategories() {
+      return axios.get(`${API_BASE_URL}/api/productCategories`)
+        .then((response) => { this.categoriesData = response.data; });
+    },
+    loadColorAspects() {
+      return axios.get(`${API_BASE_URL}/api/colors`)
+        .then((response) => { this.colorAspectsData = response.data; });
+    },    
   },
+  created() {
+    this.loadCategories();
+    this.loadColorAspects();
+  },  
 };
 </script>
