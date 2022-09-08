@@ -8,9 +8,9 @@
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link">
+          <router-link class="breadcrumbs__link" :to="{name: 'cart'}">
             Корзина
-          </a>
+          </router-link>
         </li>
       </ul>
 
@@ -39,9 +39,9 @@
             Итого: <span>{{totalSum | numberFormat}} ₽</span>
           </p>
 
-          <button class="cart__button button button--primery" type="submit">
+          <router-link v-show="totalProducts>0" class="cart__button button button--primery" :to="{name: 'order'}" tag="button" :disabled="totalProducts <= 0">
             Оформить заказ
-          </button>
+          </router-link>
         </div>
       </form>
     </section>

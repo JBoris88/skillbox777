@@ -23,8 +23,22 @@ export default new Vuex.Store({
     cartProductsData: [],
 
     cartLoading: false,
+
+    orderInfo: null,
+
+    orderLoading: false,
   },
   mutations: {
+    updateOrderInfo(state, orderInfo) {
+      state.orderInfo = orderInfo;
+    },
+    updateOrderLoading(state, value) {
+      state.orderLoading = value;
+    },      
+    resetCart(state) {
+      state.cartProducts = []; 
+      state.cartProductsData = [];
+    },    
     /*
     addProductToCart(state, { productId, amount }) {
       // console.log(amount);
@@ -70,6 +84,35 @@ export default new Vuex.Store({
     },    
   },
   getters: {
+    orderInfoDetail(state) {
+      return state.orderInfo 
+        ? {
+          id: state.orderInfo.id,
+          name: state.orderInfo.name,
+          address: state.orderInfo.address,
+          phone: state.orderInfo.phone,
+          email: state.orderInfo.email,
+          paymentType: 'картой при получении',
+          totalPrice: state.orderInfo.totalPrice,
+        }
+        : {};
+    },    
+    orderDetailProducts(state) {
+      return (state.orderInfo)
+        ? (state.orderInfo.basket.items).map((x) => ({ 
+          productId: x.product.id,
+          amount: x.quantity,
+          product: {
+            title: x.product.title,
+            price: x.price,
+            id: x.product.id,
+          },
+        }))
+        : [];
+    },
+    orderTotalPositionsNumber(state, getters) {
+      return (getters.orderDetailProducts).length || 0;
+    },    
     cartDetailProducts(state) {
       // return (state.cartProducts).map((item) => ({ ...item, product: products.find((x) => x.id === item.productId) }));
       return (state.cartProducts).map((item) => {
@@ -93,6 +136,19 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    loadOrder(context, orderId) {
+      context.commit('updateOrderLoading', true);
+      
+      return axios.get(`${API_BASE_URL}/api/orders/${orderId}`, {
+        params: {
+          userAccessKey: context.state.userAccessKey,
+        },
+      })
+        .then((response) => { 
+          context.commit('updateOrderInfo', response.data); 
+        })
+        .then(() => { context.commit('updateOrderLoading', false); });
+    },
     loadCart(context) {
       context.commit('updatecartLoading', true);
       
